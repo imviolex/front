@@ -1,8 +1,6 @@
-// src/app/page.tsxs
+// src/app/page.tsx
 'use client';
 
-import { IntroSection } from '@/components/sections/home/IntroSection';
-import { BrideGroomSection } from '@/components/sections/home/BrideGroomSection';
 
 export default function Home() {
     return (
