@@ -67,13 +67,19 @@ export function AppointmentCard() {
 
                 // مرتب‌سازی نوبت‌ها بر اساس تاریخ و زمان (از جدید به قدیم)
                 const sortedAppointments = [...response.data.appointments].sort((a, b) => {
-                    // ابتدا بر اساس تاریخ
+                    // اولویت اول: تاریخ ایجاد (created_at) از جدید به قدیم
+                    const createdAtComparison = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                    if (createdAtComparison !== 0) {
+                        return createdAtComparison;
+                    }
+
+                    // اگر created_at یکسان بود، بر اساس تاریخ نوبت (date) از جدید به قدیم
                     const dateComparison = new Date(b.date).getTime() - new Date(a.date).getTime();
                     if (dateComparison !== 0) {
                         return dateComparison;
                     }
 
-                    // اگر تاریخ یکسان بود، بر اساس زمان
+                    // اگر تاریخ نوبت هم یکسان بود، بر اساس زمان (time) از جدید به قدیم
                     const timeA = parseInt(a.time.split('-')[0].replace(':', ''));
                     const timeB = parseInt(b.time.split('-')[0].replace(':', ''));
                     return timeB - timeA;
@@ -185,9 +191,9 @@ export function AppointmentCard() {
                             <line x1="3" y1="10" x2="21" y2="10"></line>
                         </svg>
                     </div>
-                    <h3 className="text-lg font-bold mb-2">هیچ نوبت پرداخت شده‌ای یافت نشد</h3>
+                    <h3 className="text-lg font-bold mb-2">هیچ نوبت رزرو شده‌ای یافت نشد</h3>
                     <p className="text-sm text-muted-foreground text-center">
-                        شما هنوز هیچ نوبت پرداخت شده‌ای ندارید
+                        شما هنوز هیچ نوبت رزرو شده‌ای ندارید
                     </p>
                 </div>
             </div>

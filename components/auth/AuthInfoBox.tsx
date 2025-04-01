@@ -107,7 +107,7 @@ export function AuthInfoBox() {
             <div className="flex flex-col gap-4 items-center">
                 <h3 className="font-bold text-foreground flex items-center gap-2 justify-center">
                     <LogIn size={20} strokeWidth={2.5} />
-                    ورود یا ثبت‌نام
+                    ورود / ثبت‌نام
                 </h3>
 
                 <p className="text-xs text-muted-foreground text-center">
@@ -116,7 +116,7 @@ export function AuthInfoBox() {
 
                 <Button
                     onClick={openAuthDrawer}
-                    className="mt-2 h-12 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl shadow hover:shadow-md transition-shadow w-64 mx-auto block"
+                    className="mt-2 h-10 bg-primary hover:bg-primary/90 text-white text-sm rounded-xl shadow hover:shadow-md transition-shadow w-48 mx-auto block"
                 >
                     ورود / ثبت‌نام
                 </Button>

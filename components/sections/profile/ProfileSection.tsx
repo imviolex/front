@@ -28,7 +28,7 @@ export function ProfileSection() {
     }, [isAuthenticated, hasIncompleteRegistration, openAuthDrawer]);
 
     return (
-        <div className="w-full max-w-3xl mx-auto px-1 pt-20 pb-10">
+        <div className="w-full max-w-3xl mx-auto px-1 pt-20 pb-10 space-y-6">
             <AuthInfoBox />
             <AppointmentCard />
             <AuthDrawer />
