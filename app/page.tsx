@@ -1,6 +1,6 @@
 // src/app/page.tsx
 'use client';
-hello
+
 import { IntroSection } from '@/components/sections/home/IntroSection';
 import { BrideGroomSection } from '@/components/sections/home/BrideGroomSection';
 
