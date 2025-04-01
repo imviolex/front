@@ -1,12 +1,4 @@
 
-'use client';
-
-import { useEffect, useState } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { ContentCard } from "@/components/ui/custom/content-card";
-import { XCircle } from "lucide-react";
-import { useReservationState } from '@/states/reservationState';
-import { useAuth } from '@/hooks/useAuth';
 
 // اضافه کردن تابع تشخیص خطای در حال رزرو
 const isPendingAppointmentError = (errorMessage: string): boolean => {
