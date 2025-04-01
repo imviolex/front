@@ -1,5 +1,4 @@
-// src/app/page.tsx
-
+// src/app/page.tsxs
 'use client';
 
 import { IntroSection } from '@/components/sections/home/IntroSection';
