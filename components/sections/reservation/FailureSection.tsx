@@ -1,12 +1,31 @@
 // src/components/sections/reservation/FailureSection.tsx
 'use client';
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { ContentCard } from "@/components/ui/custom/content-card";
 import { XCircle } from "lucide-react";
 import { useReservationState } from '@/states/reservationState';
 import { useAuth } from '@/hooks/useAuth';
+
+// اضافه کردن تابع تشخیص خطای در حال رزرو
+const isPendingAppointmentError = (errorMessage: string): boolean => {
+    if (!errorMessage) return false;
+
+    const pendingKeywords = [
+        'در حال رزرو',
+        'شخص دیگری',
+        'منتظر بمانید',
+        'نوبت دیگری',
+        'انتخاب کنید',
+        'پندینگ',
+        'pending'
+    ];
+
+    return pendingKeywords.some(keyword =>
+        errorMessage.toLowerCase().includes(keyword.toLowerCase())
+    );
+};
 
 export function FailureSection() {
     const router = useRouter();
@@ -14,9 +33,20 @@ export function FailureSection() {
     const searchParams = useSearchParams();
     const { userInfo, appointmentId, getPaymentStatus } = useReservationState();
     const { token } = useAuth();
+    const [redirected, setRedirected] = useState(false);
 
     // دریافت پیام خطا از URL
     const error = searchParams.get('error');
+
+    // جدید: بررسی خطای نوبت در حال رزرو و هدایت به صفحه اصلی رزرو
+    useEffect(() => {
+        if (error && isPendingAppointmentError(error) && !redirected) {
+            setRedirected(true);
+            // هدایت به صفحه اصلی رزرو
+            router.push('/reservation');
+            return;
+        }
+    }, [error, router, redirected]);
 
     // تنظیم مسیر فعال به رزرو
     useEffect(() => {
@@ -42,6 +72,15 @@ export function FailureSection() {
                 try {
                     // اضافه کردن توکن به فراخوانی تابع
                     const response = await getPaymentStatus(appointmentId, token);
+
+                    // جدید: بررسی خطای نوبت در حال رزرو در پاسخ API
+                    if (response.data?.message && isPendingAppointmentError(response.data.message) && !redirected) {
+                        setRedirected(true);
+                        // هدایت به صفحه اصلی رزرو
+                        router.push('/reservation');
+                        return;
+                    }
+
                     if (response.error) {
                         console.log("Payment error:", response.message);
                     } else if (response.data?.status === 'FAILED') {
@@ -59,13 +98,19 @@ export function FailureSection() {
         }
 
         // فقط اگر هیچ خطایی در URL نیست و کاربر اطلاعات کاربری را وارد نکرده، به صفحه اصلی هدایت کن
-        if (!userInfo && !error) {
+        if (!userInfo && !error && !redirected) {
+            setRedirected(true);
             router.push('/reservation');
         }
-    }, [userInfo, router, error, appointmentId, getPaymentStatus, token]);
+    }, [userInfo, router, error, appointmentId, getPaymentStatus, token, redirected]);
 
     // اگر داده‌های لازم موجود نیست و خطایی در URL نداریم، هیچ چیزی رندر نکن
     if (!userInfo && !error) {
+        return null;
+    }
+
+    // اگر خطای در حال رزرو تشخیص داده شده و هدایت شده، هیچ چیزی رندر نکن
+    if (error && isPendingAppointmentError(error) && redirected) {
         return null;
     }
 

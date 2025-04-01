@@ -289,7 +289,10 @@ export const useReservationState = create<ReservationState>((set, get) => ({
                     (appointmentResponse.message.includes('در حال رزرو') ||
                         appointmentResponse.message.includes('شخص دیگری'))) {
 
-                    toast.error('این نوبت در حال رزرو توسط شخص دیگری می‌باشد. لطفاً منتظر بمانید یا نوبت دیگری انتخاب کنید');
+                    toast.error('این نوبت در حال رزرو توسط شخص دیگری می‌باشد. لطفاً منتظر بمانید یا نوبت دیگری انتخاب کنید', {
+                        duration: 4000,
+                        position: 'top-center'
+                    });
 
                     // رفرش کردن لیست نوبت‌ها برای نمایش وضعیت صحیح
                     await get().fetchTimeSlots();
@@ -314,7 +317,10 @@ export const useReservationState = create<ReservationState>((set, get) => ({
                     (paymentResponse.message.includes('در حال رزرو') ||
                         paymentResponse.message.includes('شخص دیگری'))) {
 
-                    toast.error('این نوبت در حال رزرو توسط شخص دیگری می‌باشد. لطفاً منتظر بمانید یا نوبت دیگری انتخاب کنید');
+                    toast.error('این نوبت در حال رزرو توسط شخص دیگری می‌باشد. لطفاً منتظر بمانید یا نوبت دیگری انتخاب کنید', {
+                        duration: 4000,
+                        position: 'top-center'
+                    });
 
                     // رفرش کردن لیست نوبت‌ها برای نمایش وضعیت صحیح
                     await get().fetchTimeSlots();

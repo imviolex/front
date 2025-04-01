@@ -18,11 +18,26 @@ interface ApiErrorResponse {
     message?: string;
 }
 
-// تابع تشخیص خطای نوبت در حال رزرو (فقط برای مسیرهای خطای غیرمنتظره)
+// تابع بهبود یافته برای تشخیص خطای نوبت در حال رزرو
 const isPendingAppointmentError = (errorMessage: string): boolean => {
-    return errorMessage.includes('در حال رزرو') ||
-        errorMessage.includes('شخص دیگری') ||
-        errorMessage.includes('منتظر بمانید');
+    if (!errorMessage) return false;
+
+    const pendingKeywords = [
+        'در حال رزرو',
+        'شخص دیگری',
+        'منتظر بمانید',
+        'نوبت دیگری',
+        'انتخاب کنید',
+        'پندینگ',
+        'در دسترس نیست',
+        'قبلاً رزرو شده',
+        'pending'
+    ];
+
+    // بررسی هر یک از کلمات کلیدی در پیام خطا
+    return pendingKeywords.some(keyword =>
+        errorMessage.toLowerCase().includes(keyword.toLowerCase())
+    );
 };
 
 export function UserInfoSection() {
@@ -85,14 +100,27 @@ export function UserInfoSection() {
                     // بروزرسانی لیست نوبت‌ها برای نمایش وضعیت‌های به‌روز
                     await fetchTimeSlots();
 
+                    // نمایش یک toast با پیام مناسب
+                    toast.error("این نوبت در حال رزرو توسط شخص دیگری است. لطفاً منتظر بمانید یا نوبت دیگری انتخاب کنید.", {
+                        duration: 4000,
+                        position: 'top-center'
+                    });
+
                     // عدم هدایت به صفحه شکست برای این نوع خطا
                     return;
                 }
 
-                // سایر انواع خطا
+                // سایر انواع خطا - افزودن بررسی دوباره
+                if (result.message && result.message.toLowerCase().includes('نوبت')) {
+                    // این احتمالاً یک خطای مربوط به نوبت است
+                    toast.error(result.message, { duration: 4000 });
+                    return;
+                }
+
                 toast.error(result.message || "خطا در پردازش پرداخت");
-                // در صورت خطا به صفحه شکست هدایت می‌شود
-                router.push('/reservation/failure');
+
+                // در صورت خطا به صفحه شکست هدایت می‌شود - با پارامتر خطا
+                router.push(`/reservation/failure?error=${encodeURIComponent(result.message || '')}`);
                 return;
             }
 
@@ -132,12 +160,20 @@ export function UserInfoSection() {
                 // بروزرسانی لیست نوبت‌ها برای نمایش وضعیت‌های به‌روز
                 await fetchTimeSlots();
 
+                // نمایش toast با پیام مناسب
+                toast.error("این نوبت در حال رزرو توسط شخص دیگری است. لطفاً منتظر بمانید یا نوبت دیگری انتخاب کنید.", {
+                    duration: 4000,
+                    position: 'top-center'
+                });
+
                 // عدم هدایت به صفحه شکست برای این نوع خطا
                 return;
             }
 
             toast.error(errorMessage);
-            router.push('/reservation/failure');
+
+            // ارسال پیام خطا به صفحه شکست
+            router.push(`/reservation/failure?error=${encodeURIComponent(errorMessage)}`);
         }
     };
 

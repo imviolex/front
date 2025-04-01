@@ -70,6 +70,27 @@ interface PaymentStatus {
 
 // تابع بهبود یافته برای پردازش خطای axios - با پشتیبانی از generic type و بدون any
 const handleApiError = <T>(error: unknown, defaultMessage: string = 'خطا در برقراری ارتباط با سرور'): ApiResponse<T> => {
+    // تابع کمکی برای تشخیص خطای نوبت در حال رزرو
+    const isPendingAppointmentError = (message: string): boolean => {
+        if (!message) return false;
+
+        const pendingKeywords = [
+            'در حال رزرو',
+            'شخص دیگری',
+            'منتظر بمانید',
+            'نوبت دیگری',
+            'انتخاب کنید',
+            'پندینگ',
+            'در دسترس نیست',
+            'قبلاً رزرو شده',
+            'pending'
+        ];
+
+        return pendingKeywords.some(keyword =>
+            message.toLowerCase().includes(keyword.toLowerCase())
+        );
+    };
+
     // خطای axios با پاسخ از سرور
     if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError<ApiErrorResponse>;
@@ -91,9 +112,14 @@ const handleApiError = <T>(error: unknown, defaultMessage: string = 'خطا در
         if (axiosError.response && axiosError.response.data) {
             const errorDetail = axiosError.response.data.detail;
             // تبدیل هر نوع داده detail به رشته
-            const errorMessage = typeof errorDetail === 'string'
+            let errorMessage = typeof errorDetail === 'string'
                 ? errorDetail
                 : (errorDetail ? JSON.stringify(errorDetail) : defaultMessage);
+
+            // اگر خطای نوبت در حال رزرو است، آن را با یک پیام خاص مشخص کنیم
+            if (isPendingAppointmentError(errorMessage)) {
+                errorMessage = "این نوبت در حال رزرو توسط شخص دیگری می‌باشد. لطفاً منتظر بمانید یا نوبت دیگری انتخاب کنید";
+            }
 
             return {
                 data: null,
