@@ -1,4 +1,3 @@
-// src/components/sections/reservation/FailureSection.tsx
 'use client';
 
 import { useEffect, useState } from "react";
