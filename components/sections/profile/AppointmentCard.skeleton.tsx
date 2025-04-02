@@ -5,28 +5,29 @@ export function AppointmentCardSkeleton() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Array(4).fill(0).map((_, index) => (
                     <div key={index} className="p-5 border border-border rounded-xl bg-card shadow-sm">
-                        {/* همان ساختار برای دسکتاپ و موبایل */}
+                        {/* هدر کارت - تاریخ و نام آرایشگر */}
                         <div className="flex justify-between items-center">
-                            <div className="h-5 bg-muted animate-pulse rounded w-28" />
-                            <div className="h-6 px-2 py-1 bg-muted animate-pulse rounded-[0.4rem] min-w-24" />
+                            <div className="h-[26px] bg-muted animate-pulse rounded w-36" />
+                            <div className="h-[24px] px-2 py-1 bg-muted animate-pulse rounded-[0.4rem] w-20" />
                         </div>
 
                         <div className="mt-4 space-y-3">
+                            {/* زمان نوبت - فقط یک عنصر */}
                             <div className="flex justify-between items-center">
                                 <span className="text-sm text-muted-foreground font-bold">زمان:</span>
-                                <div className="h-4 bg-muted animate-pulse rounded w-20" />
+                                <div className="h-[20px] bg-muted animate-pulse rounded w-20" />
                             </div>
 
+                            {/* مبلغ کل */}
                             <div className="flex justify-between items-center">
                                 <span className="text-sm text-muted-foreground font-bold">مبلغ کل:</span>
-                                <div className="h-4 bg-muted animate-pulse rounded w-24" />
+                                <div className="h-[23px] bg-muted animate-pulse rounded w-24" />
                             </div>
                         </div>
 
+                        {/* دکمه جزئیات بیشتر */}
                         <div className="mt-4">
-                            <div className="h-9 w-full bg-muted animate-pulse rounded-[0.5rem] flex items-center justify-center gap-2">
-                                <div className="h-4 w-4 bg-muted-foreground/20 rounded-full"></div>
-                                <div className="h-4 bg-muted-foreground/20 animate-pulse rounded w-24"></div>
+                            <div className="h-8 w-full bg-muted animate-pulse rounded-[0.5rem] flex items-center justify-center gap-2">
                             </div>
                         </div>
                     </div>
