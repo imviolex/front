@@ -24,11 +24,6 @@ export function AppointmentCard() {
     const [selectedAppointment, setSelectedAppointment] = useState<UserAppointment | null>(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
 
-    // تابع برای محاسبه مبلغ پرداخت شده (50% از کل مبلغ)
-    const calculatePaidAmount = (totalPrice: number) => {
-        return Math.round(totalPrice * 0.5);
-    };
-
     // دریافت لیست آرایشگرها یکبار در زمان بارگذاری
     useEffect(() => {
         async function fetchBarbers() {
@@ -138,8 +133,7 @@ export function AppointmentCard() {
         return 'نامشخص';
     };
 
-    // تابع نمایش جزئیات خدمات با قیمت (مشترک برای دسکتاپ و موبایل)
-    // تغییر نوع از any[] به AppointmentService[]
+    // تابع نمایش جزئیات خدمات با قیمت
     const renderServiceDetails = (services: AppointmentService[]) => {
         if (!services || services.length === 0) return null;
 
@@ -210,14 +204,13 @@ export function AppointmentCard() {
 
     return (
         <div className="mt-8 space-y-4">
-            {/* نمایش کارت‌های نوبت - نمایش grid در دسکتاپ و تک ستونی در موبایل */}
+            {/* نمایش کارت‌های نوبت */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {appointments.map((appointment) => (
                     <div
                         key={appointment.id}
                         className="p-5 border border-border rounded-xl bg-card shadow-sm hover:shadow transition-shadow"
                     >
-                        {/* همان ساختار برای دسکتاپ و موبایل */}
                         <div className="flex justify-between items-center">
                             <h3 className="font-bold text-sm md:text-base">{formatPersianDate(appointment.date)}</h3>
                             <Badge className="px-2 py-1 bg-primary text-primary-foreground border-0 rounded-[0.4rem]">
@@ -271,8 +264,6 @@ export function AppointmentCard() {
                 minHeight="medium"
                 disableScroll={false}
                 contentClassName="bg-card"
-                // حذف پراپرتی‌های اضافی که خطا ایجاد می‌کنند
-                // icon و iconType را حذف کرده‌ایم
             >
                 {selectedAppointment && (
                     <div className="space-y-6">
@@ -323,7 +314,7 @@ export function AppointmentCard() {
                             <div className="flex justify-between items-center">
                                 <span className="text-sm font-bold">مبلغ پرداخت شده:</span>
                                 <span className="text-sm font-medium">
-                                    {toPersianPrice(calculatePaidAmount(selectedAppointment.total_price))} تومان
+                                    {toPersianPrice(selectedAppointment.deposit_amount)} تومان
                                 </span>
                             </div>
                         </div>
