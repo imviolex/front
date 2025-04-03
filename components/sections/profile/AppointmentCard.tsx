@@ -15,6 +15,9 @@ import { Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppointmentCardSkeleton } from './AppointmentCard.skeleton';
 
+// تعداد نوبت‌های قابل بارگذاری در هر مرحله
+const APPOINTMENTS_PER_PAGE = 6;
+
 export function AppointmentCard() {
     const { token, isAuthenticated } = useAuth();
     const [appointments, setAppointments] = useState<UserAppointment[]>([]);
@@ -23,6 +26,11 @@ export function AppointmentCard() {
     const [dataLoaded, setDataLoaded] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState<UserAppointment | null>(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
+
+    // متغیرهای state جدید برای قابلیت "نمایش بیشتر"
+    const [currentSkip, setCurrentSkip] = useState(0);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [hasMoreToLoad, setHasMoreToLoad] = useState(true);
 
     // دریافت لیست آرایشگرها یکبار در زمان بارگذاری
     useEffect(() => {
@@ -52,7 +60,7 @@ export function AppointmentCard() {
 
             setLoading(true);
             try {
-                const response = await userAppointmentsApi.getUserAppointments(token);
+                const response = await userAppointmentsApi.getUserAppointments(token, 0, APPOINTMENTS_PER_PAGE);
 
                 if (response.error || !response.data) {
                     toast.error(response.message || 'خطا در دریافت نوبت‌ها');
@@ -92,8 +100,13 @@ export function AppointmentCard() {
                         }
                     } as UserAppointment;
                 });
+
                 setAppointments(mappedAppointments);
+                setCurrentSkip(mappedAppointments.length);
                 setDataLoaded(true);
+
+                // تنظیم وضعیت دکمه "نمایش بیشتر"
+                setHasMoreToLoad(response.data.appointments.length >= APPOINTMENTS_PER_PAGE);
             } catch (error) {
                 console.error('Error fetching user appointments:', error);
                 toast.error('خطا در دریافت نوبت‌ها');
@@ -105,6 +118,73 @@ export function AppointmentCard() {
 
         fetchUserAppointments();
     }, [isAuthenticated, token]);
+
+    // تابع جدید برای بارگذاری نوبت‌های بیشتر
+    const loadMoreAppointments = async () => {
+        if (!token || isLoadingMore) return;
+
+        setIsLoadingMore(true);
+        try {
+            const response = await userAppointmentsApi.getUserAppointments(
+                token,
+                currentSkip,
+                APPOINTMENTS_PER_PAGE
+            );
+
+            if (response.error || !response.data) {
+                toast.error(response.message || 'خطا در دریافت نوبت‌های بیشتر');
+                return;
+            }
+
+            // مرتب‌سازی نوبت‌های جدید
+            const sortedNewAppointments = [...response.data.appointments].sort((a, b) => {
+                const createdAtComparison = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                if (createdAtComparison !== 0) return createdAtComparison;
+
+                const dateComparison = new Date(b.date).getTime() - new Date(a.date).getTime();
+                if (dateComparison !== 0) return dateComparison;
+
+                const timeA = parseInt(a.time.split('-')[0].replace(':', ''));
+                const timeB = parseInt(b.time.split('-')[0].replace(':', ''));
+                return timeB - timeA;
+            });
+
+            // تبدیل نوبت‌های جدید به فرمت مناسب
+            const mappedNewAppointments = sortedNewAppointments.map(app => {
+                return {
+                    ...app,
+                    barber: app.barber || {
+                        id: app.barber_id,
+                        first_name: '',
+                        last_name: '',
+                        specialty: '',
+                        available: true
+                    }
+                } as UserAppointment;
+            });
+
+            // اضافه کردن نوبت‌های جدید به لیست موجود
+            setAppointments(prevAppointments => [...prevAppointments, ...mappedNewAppointments]);
+
+            // بروزرسانی شاخص پرش
+            setCurrentSkip(prev => prev + mappedNewAppointments.length);
+
+            // بررسی آیا نوبت بیشتری وجود دارد یا خیر
+            const noMoreAppointments = mappedNewAppointments.length < APPOINTMENTS_PER_PAGE;
+            setHasMoreToLoad(!noMoreAppointments);
+
+            // فقط اگر نوبت جدیدی دریافت نشد، پیام نمایش دهیم
+            if (mappedNewAppointments.length === 0) {
+                toast.info('نوبت بیشتری وجود ندارد');
+                setHasMoreToLoad(false);
+            }
+        } catch (error) {
+            console.error('Error loading more appointments:', error);
+            toast.error('خطا در بارگذاری نوبت‌های بیشتر');
+        } finally {
+            setIsLoadingMore(false);
+        }
+    };
 
     const handleOpenDetails = (appointment: UserAppointment) => {
         setSelectedAppointment(appointment);
@@ -245,11 +325,29 @@ export function AppointmentCard() {
                             >
                                 <Info className="h-4 w-4" />
                                 <span>جزئیات بیشتر</span>
-                            </Button>
+                            </Button>≤
                         </div>
                     </div>
                 ))}
             </div>
+
+            {/* دکمه نمایش بیشتر به صورت متن ساده */}
+            {appointments.length > 0 && hasMoreToLoad && (
+                <div className="mt-6 text-center">
+                    {isLoadingMore ? (
+                        <p className="text-sm text-muted-foreground cursor-wait">
+                            در حال بارگذاری...
+                        </p>
+                    ) : (
+                        <p
+                            className="text-sm text-muted-foreground cursor-pointer hover:text-muted-foreground/80 transition-colors"
+                            onClick={loadMoreAppointments}
+                        >
+                            نمایش نوبت‌های بیشتر
+                        </p>
+                    )}
+                </div>
+            )}
 
             {/* درآور جزئیات نوبت با استفاده از CustomDrawer */}
             <CustomDrawer

@@ -3,7 +3,7 @@ export function AppointmentCardSkeleton() {
     return (
         <div className="mt-8 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Array(4).fill(0).map((_, index) => (
+                {Array(6).fill(0).map((_, index) => (
                     <div key={index} className="p-5 border border-border rounded-xl bg-card shadow-sm">
                         {/* هدر کارت - تاریخ و نام آرایشگر */}
                         <div className="flex justify-between items-center">
