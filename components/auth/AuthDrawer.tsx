@@ -58,12 +58,12 @@ export function AuthDrawer() {
     const getMinHeight = () => {
         switch (currentStep) {
             case 'otp':
-                return 'min';  // برای مرحله OTP ارتفاع متوسط
+                return 'min';
             case 'register':
             case 'edit':
-                return 'medium';  // برای مرحله ثبت‌نام و ویرایش ارتفاع متوسط
+                return 'medium';
             default:
-                return 'auto';    // برای مرحله ورود شماره تلفن، ارتفاع پیش‌فرض
+                return 'auto';
         }
     };
 
