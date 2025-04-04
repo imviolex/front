@@ -325,7 +325,7 @@ export function AppointmentCard() {
                             >
                                 <Info className="h-4 w-4" />
                                 <span>جزئیات بیشتر</span>
-                            </Button>≤
+                            </Button>
                         </div>
                     </div>
                 ))}

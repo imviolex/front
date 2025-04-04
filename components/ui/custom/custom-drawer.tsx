@@ -102,7 +102,7 @@ export function CustomDrawer({
         switch (minHeight) {
             case 'min': return 'min-h-[50vh]';
             case 'medium': return 'min-h-[57vh]';
-            case 'large': return 'min-h-[57h]';
+            case 'large': return 'min-h-[57vh]';
             case 'full': return 'min-h-[90vh]';
             case 'auto':
             default: return '';
