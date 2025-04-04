@@ -7,7 +7,7 @@ export function AppointmentCardSkeleton() {
                     <div key={index} className="p-5 border border-border rounded-xl bg-card shadow-sm">
                         {/* هدر کارت - تاریخ و نام آرایشگر */}
                         <div className="flex justify-between items-center">
-                            <div className="h-[26px] bg-muted animate-pulse rounded w-36" />
+                            <div className="h-[25px] bg-muted animate-pulse rounded w-36" />
                             <div className="h-[24px] px-2 py-1 bg-muted animate-pulse rounded-[0.4rem] w-20" />
                         </div>
 
